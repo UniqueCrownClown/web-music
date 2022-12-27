@@ -27,15 +27,8 @@ style.css   // 前端样式
 server.js   // node 端同步逻辑
 ```
 
-## 关于我
-
-[Github](https://github.com/lvyueyang)
-
 ## 最后
 
 感谢 [jsososo](https://github.com/jsososo) 的项目
 
-## 再最后
-
-战无不胜的毛泽东思想万岁！  
-世界人民大团结万岁！
+感谢 [Github](https://github.com/lvyueyang)
