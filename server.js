@@ -38,7 +38,7 @@ main();
 
 /** 将数据更新到 gist */
 function updateData(data) {
-  return octokit.request('PATCH /gists/cb11eaafbe69fc7ba63c38f9ff40e0d9', {
+  return octokit.request('PATCH /gists/a0cd490b452d4b93b7153bdce9a43d4b', {
     gist_id: 'GIST_ID',
     description: new Date(),
     files: {
