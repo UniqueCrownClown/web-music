@@ -99,7 +99,7 @@
   /** 获取最新的文件地址 */
   function getJsonUrl() {
     return fetch(
-      'https://api.github.com/gists/cb11eaafbe69fc7ba63c38f9ff40e0d9',
+      'https://api.github.com/gists/a0cd490b452d4b93b7153bdce9a43d4b',
       {
         headers: {
           Authorization: '',
