@@ -34,7 +34,7 @@ function main(singerId,patchToken,fileName) {
     });
 }
 
-// main(112,'a0cd490b452d4b93b7153bdce9a43d4b','jay-music.json');
+main(112,'a0cd490b452d4b93b7153bdce9a43d4b','jay-music.json');
 main(116,'45b787c1fc27cf0070eefad0c3504d0e','chen-music.json');
 
 /** 将数据更新到 gist */
