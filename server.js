@@ -9,16 +9,16 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-function main() {
+function main(singerId,patchToken,fileName) {
   console.log('开始获取');
-  return getAllData()
+  return getAllData(singerId)
     .then((d) => {
       const data = { list: d, errData: d.filter((item) => !item.songInfo) };
       if (d.length < 360) {
         console.log('歌曲数据不全，不推送');
         throw new Error('歌曲数据不全');
       }
-      updateData(data)
+      updateData(data,patchToken,fileName)
         .then((res) => {
           console.log('更新完成', res);
         })
@@ -34,15 +34,16 @@ function main() {
     });
 }
 
-main();
+// main(112,'a0cd490b452d4b93b7153bdce9a43d4b','jay-music.json');
+main(116,'45b787c1fc27cf0070eefad0c3504d0e','chen-music.json');
 
 /** 将数据更新到 gist */
-function updateData(data) {
-  return octokit.request('PATCH /gists/a0cd490b452d4b93b7153bdce9a43d4b', {
+function updateData(data, patchToken='a0cd490b452d4b93b7153bdce9a43d4b', fileName='jay-music.json') {
+  return octokit.request(`PATCH /gists/${patchToken}`, {
     gist_id: 'GIST_ID',
     description: new Date(),
     files: {
-      'jay-music.json': {
+      [fileName]: {
         content: JSON.stringify(data),
       },
     },
@@ -67,11 +68,11 @@ function arraySlice(arr, total = 10) {
 }
 
 /** 获取全部歌曲列表 */
-function getAllSongs() {
+function getAllSongs(singerId = 112 ) {
   const list = [];
   return new Promise((resolve) => {
     function loop(pageNo = 1) {
-      miguMusic('singer/songs', { id: 112, pageNo })
+      miguMusic('singer/songs', { id: singerId, pageNo })
         .then((data) => {
           list.push(...(data.list || []));
           if (data.totalPage < 20) {
@@ -95,10 +96,10 @@ function getSongInfo(cid) {
 }
 
 /** 整合成一个完整的 json */
-function getAllData() {
+function getAllData(singerId) {
   return new Promise((resolve) => {
     console.log('获取全部歌曲');
-    getAllSongs().then((data) => {
+    getAllSongs(singerId).then((data) => {
       console.log('获取完成');
       const sliceList = arraySlice(data);
 

@@ -14,13 +14,15 @@
     },
   };
   const CATCH_DATA_KEY = 'MUSIC_DATA';
+  const CATCH_DATA_KEY2 = 'MUSIC_DATA2';
 
   const coverDom = document.querySelector('#player .cover img');
   const audioDom = document.querySelector('#audio');
   const listDom = document.querySelector('#list');
   const modalDom = document.querySelector('#modal');
   const DISABLE_LIST_KEY = 'DISABLE_LIST';
-
+  let gist_token = 'a0cd490b452d4b93b7153bdce9a43d4b'; // 当前gist_token
+  let fileName = 'jay-music.json'; // 当前文件名
   let songList = []; // 歌曲列表
   let currentSong = null; // 当前播放的歌曲
   let playerMode = PLAYER_MODE.LOOP.value; // 播放模式
@@ -97,24 +99,24 @@
   }
 
   /** 获取最新的文件地址 */
-  function getJsonUrl() {
-    return fetch(
-      'https://api.github.com/gists/a0cd490b452d4b93b7153bdce9a43d4b',
-      {
-        headers: {
-          Authorization: '',
-          Accept: 'application/vnd.github+json'
-        }
-      }
-    )
+  function getJsonUrl(
+    gist_token = 'a0cd490b452d4b93b7153bdce9a43d4b',
+    fileName = 'jay-music.json',
+  ) {
+    return fetch(`https://api.github.com/gists/${gist_token}`, {
+      headers: {
+        Authorization: '',
+        Accept: 'application/vnd.github+json',
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
-        return res.files['jay-music.json'].raw_url;
+        return res.files[fileName].raw_url;
       });
   }
 
   function getDataList() {
-    return getJsonUrl().then((url) => {
+    return getJsonUrl(gist_token, fileName).then((url) => {
       return fetch(url)
         .then((res) => res.json())
         .then((res) => {
@@ -125,7 +127,12 @@
 
   /** 拉取歌曲列表 */
   function getList() {
-    const CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY);
+    let CATCH_DATA;
+    if (fileName === 'jay-music.json') {
+      CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY);
+    } else {
+      CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY2);
+    }
     const data = isJson(CATCH_DATA);
     if (data) {
       if ((data.validDate = getToday())) {
@@ -134,13 +141,23 @@
       }
     }
     getDataList().then((list) => {
-      window.localStorage.setItem(
-        CATCH_DATA_KEY,
-        JSON.stringify({
-          list,
-          validDate: getToday(), // 缓存有效日期
-        }),
-      );
+      if (fileName === 'jay-music.json') {
+        window.localStorage.setItem(
+          CATCH_DATA_KEY,
+          JSON.stringify({
+            list,
+            validDate: getToday(), // 缓存有效日期
+          }),
+        );
+      } else {
+        window.localStorage.setItem(
+          CATCH_DATA_KEY2,
+          JSON.stringify({
+            list,
+            validDate: getToday(), // 缓存有效日期
+          }),
+        );
+      }
       renderDataList(list);
     });
   }
@@ -276,6 +293,17 @@
         }
       });
     }, 500);
+  });
+  // 切换
+  document.querySelector('#switch').addEventListener('click', (e) => {
+    if (fileName === 'jay-music.json') {
+      gist_token = '45b787c1fc27cf0070eefad0c3504d0e';
+      fileName = 'chen-music.json';
+    } else {
+      gist_token = 'a0cd490b452d4b93b7153bdce9a43d4b';
+      fileName = 'jay-music.json';
+    }
+    getList();
   });
 
   document.querySelector('#player .cover').addEventListener('click', (e) => {
