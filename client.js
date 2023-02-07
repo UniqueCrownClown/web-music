@@ -15,6 +15,7 @@
   };
   const CATCH_DATA_KEY = 'MUSIC_DATA';
   const CATCH_DATA_KEY2 = 'MUSIC_DATA2';
+  const CATCH_DATA_KEY3 = 'MUSIC_DATA3';
 
   const coverDom = document.querySelector('#player .cover img');
   const audioDom = document.querySelector('#audio');
@@ -130,8 +131,10 @@
     let CATCH_DATA;
     if (fileName === 'jay-music.json') {
       CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY);
-    } else {
+    } else if (fileName === 'chen-music.json') {
       CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY2);
+    } else {
+      CATCH_DATA = window.localStorage.getItem(CATCH_DATA_KEY3);
     }
     const data = isJson(CATCH_DATA);
     if (data) {
@@ -149,9 +152,17 @@
             validDate: getToday(), // 缓存有效日期
           }),
         );
-      } else {
+      } else if (fileName === 'chen-music.json') {
         window.localStorage.setItem(
           CATCH_DATA_KEY2,
+          JSON.stringify({
+            list,
+            validDate: getToday(), // 缓存有效日期
+          }),
+        );
+      } else {
+        window.localStorage.setItem(
+          CATCH_DATA_KEY3,
           JSON.stringify({
             list,
             validDate: getToday(), // 缓存有效日期
@@ -295,14 +306,30 @@
     }, 500);
   });
   // 切换
-  document.querySelector('#switch').addEventListener('click', (e) => {
-    if (fileName === 'jay-music.json') {
+  // document.querySelector('#switch').addEventListener('click', (e) => {
+  //   if (fileName === 'jay-music.json') {
+  //     gist_token = '45b787c1fc27cf0070eefad0c3504d0e';
+  //     fileName = 'chen-music.json';
+  //   } else {
+  //     gist_token = 'a0cd490b452d4b93b7153bdce9a43d4b';
+  //     fileName = 'jay-music.json';
+  //   }
+  //   getList();
+  // });
+  const switchDom = document.getElementById('select_switch');
+  switchDom.addEventListener('change', (e) => {
+    // console.log(switchDom.value);
+    if (switchDom.value === 'eason') {
       gist_token = '45b787c1fc27cf0070eefad0c3504d0e';
       fileName = 'chen-music.json';
-    } else {
+    } else if (switchDom.value === 'jay') {
       gist_token = 'a0cd490b452d4b93b7153bdce9a43d4b';
       fileName = 'jay-music.json';
+    } else if (switchDom.value === 'other') {
+      gist_token = '9b630913ead5ebc8e38c7ece55f9c9c8';
+      fileName = 'other-music.json';
     }
+    currentSong = null;
     getList();
   });
 

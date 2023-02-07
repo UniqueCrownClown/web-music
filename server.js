@@ -9,16 +9,16 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-function main(singerId,patchToken,fileName) {
+function main(singerId, patchToken, fileName) {
   console.log('开始获取');
   return getAllData(singerId)
     .then((d) => {
       const data = { list: d, errData: d.filter((item) => !item.songInfo) };
-      if (d.length < 360) {
-        console.log('歌曲数据不全，不推送');
-        throw new Error('歌曲数据不全');
-      }
-      updateData(data,patchToken,fileName)
+      // if (d.length < 360) {
+      //   console.log('歌曲数据不全，不推送');
+      //   throw new Error('歌曲数据不全');
+      // }
+      updateData(data, patchToken, fileName)
         .then((res) => {
           console.log('更新完成', res);
         })
@@ -34,11 +34,16 @@ function main(singerId,patchToken,fileName) {
     });
 }
 
-main(112,'a0cd490b452d4b93b7153bdce9a43d4b','jay-music.json');
-main(116,'45b787c1fc27cf0070eefad0c3504d0e','chen-music.json');
+// main(112,'a0cd490b452d4b93b7153bdce9a43d4b','jay-music.json');
+// main(116, '45b787c1fc27cf0070eefad0c3504d0e', 'chen-music.json');
+main(-1, '9b630913ead5ebc8e38c7ece55f9c9c8', 'other-music.json');
 
 /** 将数据更新到 gist */
-function updateData(data, patchToken='a0cd490b452d4b93b7153bdce9a43d4b', fileName='jay-music.json') {
+function updateData(
+  data,
+  patchToken = 'a0cd490b452d4b93b7153bdce9a43d4b',
+  fileName = 'jay-music.json',
+) {
   return octokit.request(`PATCH /gists/${patchToken}`, {
     gist_id: 'GIST_ID',
     description: new Date(),
@@ -68,8 +73,35 @@ function arraySlice(arr, total = 10) {
 }
 
 /** 获取全部歌曲列表 */
-function getAllSongs(singerId = 112 ) {
+function getAllSongs(singerId = 112) {
   const list = [];
+  if (singerId === -1) {
+    return new Promise((resolve) => {
+      let firstFlag = false,
+        count = 10;
+      function loop(pageNo = 1) {
+        miguMusic('/new/songs', { pageNo })
+          .then((data) => {
+            if (!firstFlag) {
+              count = data.total;
+              firstFlag = true;
+            }
+            list.push(...(data.list || []));
+            if (count < 0) {
+              resolve(list);
+            } else {
+              count = count - 10;
+              loop(pageNo + 1);
+            }
+          })
+          .catch((e) => {
+            console.error(`第 ${pageNo} 页获取失败`);
+            loop(pageNo + 1);
+          });
+      }
+      loop();
+    });
+  }
   return new Promise((resolve) => {
     function loop(pageNo = 1) {
       miguMusic('singer/songs', { id: singerId, pageNo })
